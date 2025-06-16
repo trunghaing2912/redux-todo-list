@@ -48,6 +48,16 @@ const todosSlice = createSlice({
       .addCase(fetchTodos.fulfilled, (state, action) => {
         state.todos = action.payload;
         state.status = "idle";
+      })
+      .addCase(addNewTodo.fulfilled, (state, action) => {
+        state.todos.push(action.payload);
+      })
+      .addCase(updateTodo.fulfilled, (state, action) => {
+        let currentTodo = state.todos.find(
+          (todo) => todo.id === action.payload
+        );
+
+        currentTodo = action.payload;
       });
   },
 });
@@ -66,8 +76,23 @@ export const addNewTodo = createAsyncThunk(
       method: "POST",
       body: JSON.stringify(newTodo),
     });
+    const data = await res.json();
 
-    console.log({ res });
+    return data.todos;
+  }
+);
+
+export const updateTodo = createAsyncThunk(
+  "todos/updateTodo",
+  async (updateTodo) => {
+    const res = await fetch("/api/updateTodo", {
+      method: "POST",
+      body: JSON.stringify(updateTodo),
+    });
+
+    const data = res.json();
+
+    return data.todos;
   }
 );
 
